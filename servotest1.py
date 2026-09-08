@@ -18,10 +18,15 @@ def set_servo_angle(servo_obj, angle):
     duty = int(1638 + (angle / 180) * (7864 - 1638))
     servo_obj.duty_u16(duty)
 
-for s in servos:
+
+id=1
+for i, s in enumerate(servos):
     time.sleep(0.1)
     s.freq(50)  # 50Hz
     set_servo_angle(s, 0)
+    if i == id:
+        set_servo_angle(s, 90)
+
 
 # for s in servos:
 #     set_servo_angle(s, 90)

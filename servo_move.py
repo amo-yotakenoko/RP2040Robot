@@ -18,12 +18,20 @@ def set_servo_angle(servo_obj, angle):
     duty = int(1638 + (angle / 180) * (7864 - 1638))
     servo_obj.duty_u16(duty)
 
-for s in servos:
-    time.sleep(0.1)
-    s.freq(50)  # 50Hz
-    set_servo_angle(s, 0)
+
+i=0
+while True:
+    print(i)
+    i+=1
+    for j,s in enumerate(servos): 
+        time.sleep(0.1)
+        s.freq(50)  # 50Hz
+        set_servo_angle(s, math.sin(i/10)*90+90)  # 0-180度の範囲でサーボを動かす
 
 # for s in servos:
 #     set_servo_angle(s, 90)
 
 print("Finished.")
+
+
+
