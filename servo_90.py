@@ -21,7 +21,7 @@ def set_servo_angle(servo_obj, angle):
 for s in servos:
     time.sleep(0.1)
     s.freq(50)  # 50Hz
-    set_servo_angle(s, 0)
+    set_servo_angle(s, 90)
 
 # for s in servos:
 #     set_servo_angle(s, 90)

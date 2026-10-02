@@ -1,0 +1,69 @@
+# =================================
+# Unity generated files & folders
+# =================================
+[Ll]ibrary/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Uu]nityIAPOrphanDB/
+[Mm]etalShaders/
+[Uu]nityShaderCache/
+
+# =================================
+# Asset Store Tools
+# =================================
+[Aa]ssets/AssetStoreTools*
+
+# =================================
+# Visual Studio / VS Code / Rider / IDE
+# =================================
+.vs/
+.gradle/
+export/
+obj/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vscode/
+
+# =================================
+# Builds & Packages
+# =================================
+*.apk
+*.aab
+*.unitypackage
+/[Bb]uild/
+/[Bb]uilds/
+/[Rr]elease/
+/[Dd]ebug/
+/[Mm]igrations/
+
+# =================================
+# Operating System files
+# =================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS / Linux
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+*.swp
+*.swo
