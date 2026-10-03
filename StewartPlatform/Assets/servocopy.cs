@@ -26,6 +26,9 @@ public class servocopy : MonoBehaviour
                 // Transform hone = servo.GetComponent<servo>().servoHone;
                 // hone.localScale = new Vector3(hone.localScale.x, hone.localScale.y, -hone.localScale.z);
                 copy.GetComponent<servo>().isOpposite = true;
+                Vector3 headLodPoint = copy.GetComponent<servo>().HeadLodPoint.localPosition;
+                headLodPoint = new Vector3(headLodPoint.x, -headLodPoint.y, headLodPoint.z);
+                copy.GetComponent<servo>().HeadLodPoint.localPosition = headLodPoint;
             }
             copy.transform.RotateAround(this.transform.position, Vector3.up, i / 2 * 360 / 3);
             servos.Add(copy);

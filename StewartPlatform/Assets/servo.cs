@@ -10,7 +10,7 @@ public class servo : MonoBehaviour
     public int id;
     public float angle;
 
-    float target_lod_length = 50;
+    float target_lod_length = 100;
 
     float baseY, baseZ;       // 最初のy, z（固定）
     float initialAngle;       // 最初の角度（解の選択基準）
