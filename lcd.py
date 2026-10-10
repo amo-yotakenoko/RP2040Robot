@@ -10,6 +10,7 @@ display.text('hello world', 0, 0, 1)
 # 先頭行に Hello World を印字
 for i in range(10000):
     display.rotate(False)
-    display.fill(0)
-    display.text(f'{i}', 0, 0, 1)
+    # display.fill(0)
+    # display.text(f'{i}', 0, 0, 1)
+    display.rect(0, 0, 128, 32, 1)
     display.show()

@@ -35,7 +35,7 @@ public class servo : MonoBehaviour
         return Vector3.Distance(HornLodPoint.position, HeadLodPoint.position) - target_lod_length;
     }
 
-    float SolveAngle(float minA, float maxA)
+    float SolveAngle(float minA, float maxA, out bool solved)
     {
         const float step = 2f;
         float best = float.NaN;
@@ -75,6 +75,7 @@ public class servo : MonoBehaviour
             prevA = a; prevE = e;
         }
 
+        solved = !float.IsNaN(best);
         return float.IsNaN(best) ? minAbsAngle : best;
     }
 
@@ -83,12 +84,13 @@ public class servo : MonoBehaviour
         float minAngle = isOpposite ? -180f : 0f;
         float maxAngle = isOpposite ? 0f : 180f;
 
-        float currentAngle = SolveAngle(minAngle, maxAngle);
+        bool solved;
+        float currentAngle = SolveAngle(minAngle, maxAngle, out solved);
         servoHone.localEulerAngles = new Vector3(currentAngle, baseY, baseZ);
 
         angle = isOpposite ? 180 + currentAngle : currentAngle;
         this.gameObject.name = $"{angle}";
 
-        Debug.DrawLine(HornLodPoint.position, HeadLodPoint.position, Color.green);
+        Debug.DrawLine(HornLodPoint.position, HeadLodPoint.position, solved ? Color.green : Color.red);
     }
 }

@@ -5,7 +5,7 @@ import ssd1306
 
 # OLEDディスプレイの初期化
 i2c = I2C(1, sda=Pin(14), scl=Pin(15))
-display = ssd1306.SSD1306_I2C(128, 32, i2c, addr=0x3C)
+display = ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3C)
 
 # サーボの初期化 (16〜21番)
 servos = [PWM(Pin(p)) for p in range(16, 22)]
@@ -22,6 +22,12 @@ poll.register(sys.stdin, select.POLLIN)
 
 current_msg = "Waiting..."
 
+display.fill(0)
+display.rotate(False)
+display.text("LCD Monitor:", 0, 0, 1)
+display.text(current_msg, 0, 16, 1)
+display.show()
+
 while True:
     # シリアルからデータが来ていれば非ブロッキングで読み取る
     events = poll.poll(10)
@@ -35,15 +41,16 @@ while True:
                 if ',' in current_msg:
                     parts = current_msg.split(',')
                     if len(parts) == 2:
-                        i = int(parts[0])
-                        angle = float(parts[1])
-                        if 0 <= i < len(servos):
-                            set_servo_angle(servos[i], angle)
+                        if parts[0]=="FACE":
+                            image_data = bytes.fromhex(parts[1])
+                            display.buffer[:] = image_data
+                            display.show()
+                        else:
+                            i = int(parts[0])
+                            angle = float(parts[1])
+                            if 0 <= i < len(servos):
+                                set_servo_angle(servos[i], angle)
             except:
                 pass
 
     # LCD画面の更新
-    # display.fill(0)
-    # display.text("LCD Monitor:", 0, 0, 1)
-    # display.text(current_msg, 0, 16, 1)
-    # display.show()

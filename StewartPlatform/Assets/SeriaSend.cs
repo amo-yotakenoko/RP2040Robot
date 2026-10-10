@@ -61,8 +61,12 @@ public class SeriaSend : MonoBehaviour
                 }
 
                 // 0.1秒待機（次のサーボへ）
-                yield return new WaitForSeconds(0.01f);
+                // yield return new WaitForSeconds(0.001f);
+
             }
+            yield return null;
+            byte[] faceFrame = FindFirstObjectByType<faceCamera>().GetfaceFrame();
+            SendData($"FACE,{BitConverter.ToString(faceFrame).Replace("-", "")}");
         }
     }
 
