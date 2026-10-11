@@ -136,12 +136,17 @@ try:
                 data=rgb
             )
 
+          
+
             timestamp_ms += 1
 
             result = landmarker.detect_for_video(
                 mp_image,
                 timestamp_ms
             )
+
+              # frameを黒で塗りつぶす
+            frame.fill(0)
 
             # =========================
             # 顔を検出した場合

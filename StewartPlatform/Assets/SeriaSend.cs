@@ -57,13 +57,13 @@ public class SeriaSend : MonoBehaviour
 
                         // シリアルポート経由で送信
                         SendData(message);
-                        yield return null;
                     }
                 }
 
                 // 0.1秒待機（次のサーボへ）
 
             }
+            yield return null;
             byte[] faceFrame = FindFirstObjectByType<FaceCamera>().GetfaceFrame();
             // yield return new WaitForSeconds(0.1f);
             SendData($"FACE,{BitConverter.ToString(faceFrame).Replace("-", "")}");
