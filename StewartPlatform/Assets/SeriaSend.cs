@@ -65,7 +65,7 @@ public class SeriaSend : MonoBehaviour
 
             }
             yield return null;
-            byte[] faceFrame = FindFirstObjectByType<faceCamera>().GetfaceFrame();
+            byte[] faceFrame = FindFirstObjectByType<FaceCamera>().GetfaceFrame();
             SendData($"FACE,{BitConverter.ToString(faceFrame).Replace("-", "")}");
         }
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class faceCamera : MonoBehaviour
+public class FaceCamera : MonoBehaviour
 {
     private Camera cam;
     private RenderTexture rt;
@@ -33,7 +33,7 @@ public class faceCamera : MonoBehaviour
 
         for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = width - 1; x >= 0; x--)
             {
                 Color32 c = pixels[y * width + x];
                 int gray = (c.r * 299 + c.g * 587 + c.b * 114) / 1000;

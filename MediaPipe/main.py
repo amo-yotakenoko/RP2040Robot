@@ -55,9 +55,9 @@ def rotation_matrix_to_quaternion(R):
     return [float(x), float(y), float(z), float(w)]
 
 
-def send_face_data(position, rotation_matrix):
+def send_face_data(position, rotation_matrix,blendshapes):
     qx, qy, qz, qw = rotation_matrix_to_quaternion(rotation_matrix)
-
+    
     data = {
         "position": {
             "x": float(position[0]),
@@ -69,8 +69,11 @@ def send_face_data(position, rotation_matrix):
             "y": qy,
             "z": qz,
             "w": qw
-        }
+        },
+        "blendshapes": blendshapes
     }
+
+    print(data)
 
     sock.sendto(
         json.dumps(data).encode("utf-8"),
@@ -92,6 +95,7 @@ options = FaceLandmarkerOptions(
     ),
     running_mode=VisionRunningMode.VIDEO,
     num_faces=1,
+    output_face_blendshapes=True,
     output_facial_transformation_matrixes=True
 )
 
@@ -182,11 +186,16 @@ try:
                 # 回転成分（3x3）
                 rotation = matrix[:3, :3]
 
+                blendshape_list = [
+                    {"name": b.category_name, "value": float(b.score)}
+                    for b in result.face_blendshapes[0]
+                ]
+
                 # -------------------------
                 # 3. UDP送信
                 # -------------------------
 
-                send_face_data(position, rotation)
+                send_face_data(position, rotation, blendshape_list)
 
                 # -------------------------
                 # 4. デバッグ表示
@@ -244,6 +253,44 @@ try:
                     (255, 200, 0),
                     2
                 )
+
+                # -------------------------
+                # 5. ブレンドシェイプ表示
+                # -------------------------
+
+                if result.face_blendshapes:
+                    blendshapes = result.face_blendshapes[0]
+
+                    y0 = 120
+                    rows_per_col = (len(blendshapes) + 1) // 2
+                    for i, b in enumerate(blendshapes):
+                        name = b.category_name
+                        score = float(b.score)
+                        col = i // rows_per_col
+                        row = i % rows_per_col
+                        y = y0 + row * 20
+                        # 2列表示（左列 x=10 / 右列 x=330）
+                        text_x = 10 + col * 320
+                        bar_x0 = text_x + 220
+                        cv2.putText(
+                            frame,
+                            f"{name}: {score:.2f}",
+                            (text_x, y),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.45,
+                            (0, 255, 255),
+                            1
+                        )
+                        # 簡易バー表示（右側）
+                        bar_len = int(score * 80)
+                        cv2.rectangle(
+                            frame,
+                            (bar_x0, y - 10),
+                            (bar_x0 + bar_len, y - 4),
+                            (0, 255, 255),
+                            -1
+                        )
+
 
             cv2.imshow("Face Tracking + UDP", frame)
 

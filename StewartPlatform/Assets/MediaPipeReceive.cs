@@ -8,27 +8,18 @@ using UnityEngine;
 public class MediaPipeReceive : MonoBehaviour
 {
     [Serializable]
-    public class Vec3
+    public struct BlendShapeEntry
     {
-        public float x;
-        public float y;
-        public float z;
-    }
-
-    [Serializable]
-    public class Quat
-    {
-        public float x;
-        public float y;
-        public float z;
-        public float w;
+        public string name;
+        public float value;
     }
 
     [Serializable]
     public class FaceData
     {
-        public Vec3 position;
-        public Quat rotation;
+        public Vector3 position;
+        public Quaternion rotation;
+        public BlendShapeEntry[] blendshapes;
     }
 
     private UdpClient client;
@@ -79,17 +70,17 @@ public class MediaPipeReceive : MonoBehaviour
             {
                 byte[] bytes = client.Receive(ref remoteEndPoint);
                 string json = Encoding.UTF8.GetString(bytes);
-                print($"Received JSON: {json}"); // デバッグ用に受信したJSONを表示
+                // print($"Received JSON: {json}"); // デバッグ用に受信したJSONを表示
 
                 FaceData data = JsonUtility.FromJson<FaceData>(json);
                 // print(data);
 
-                if (data != null && data.position != null && data.rotation != null)
+                if (data != null)
                 {
                     lock (dataLock)
                     {
                         latestData = data;
-                        print($"Received Data: pos=({data.position.x}, {data.position.y}, {data.position.z}), rot=({data.rotation.x}, {data.rotation.y}, {data.rotation.z}, {data.rotation.w})");
+                        // print($"Received Data: pos=({data.position.x}, {data.position.y}, {data.position.z}), rot=({data.rotation.x}, {data.rotation.y}, {data.rotation.z}, {data.rotation.w})");
                     }
                 }
             }
@@ -117,7 +108,7 @@ public class MediaPipeReceive : MonoBehaviour
             data = latestData;
         }
 
-        if (data == null || data.position == null || data.rotation == null)
+        if (data == null)
             return;
 
         // Pythonから受信した位置
@@ -141,6 +132,17 @@ public class MediaPipeReceive : MonoBehaviour
 
         // オブジェクトの回転に反映
         this.transform.localRotation = receivedRotation;
+
+        // facemeshを反映
+        FaceMesh faceMesh = FindFirstObjectByType<FaceMesh>();
+
+        if (faceMesh != null && data.blendshapes != null)
+        {
+            foreach (var b in data.blendshapes)
+            {
+                faceMesh.setBlendShape(b.name, b.value);
+            }
+        }
     }
 
     void OnApplicationQuit()
