@@ -2,55 +2,139 @@ from machine import Pin, PWM, I2C
 import sys
 import select
 import ssd1306
+import time
+import _thread
+
+# サーボ目標値の共有用ロック（メインスレッド⇔サーボスレッド間）
+servo_lock = _thread.allocate_lock()
 
 # OLEDディスプレイの初期化
 i2c = I2C(1, sda=Pin(14), scl=Pin(15))
 display = ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3C)
 
-# サーボの初期化 (16〜21番)
-servos = [PWM(Pin(p)) for p in range(16, 22)]
-for s in servos:
-    s.freq(50)
 
-def set_servo_angle(servo_obj, angle):
-    mapped = int((angle - 0) * (180 - 10) / 180 + 10)
-    servo_obj.duty_u16(int(1638 + (mapped / 180) * (7864 - 1638)))
+
+class Servo:
+    def __init__(self, pin_number):
+        self.pwm = PWM(Pin(pin_number))
+        self.pwm.freq(50)  # 50Hz for standard servos
+        self.now_angle = 90.0
+        self.target_angle = 90.0
+        self.update()
+
+    def set_servo_angle(self, target_angle):
+        servo_lock.acquire()
+        try:
+            self.target_angle = float(target_angle)
+        finally:
+            servo_lock.release()
+
+    def get_angle(self):
+        servo_lock.acquire()
+        try:
+            return self.now_angle
+        finally:
+            servo_lock.release()
+
+    def update(self):
+        # サーボスレッドからのみ呼ぶ。ロックは短時間だけ掴む。
+        servo_lock.acquire()
+        try:
+            target = self.target_angle
+            now = self.now_angle
+        finally:
+            servo_lock.release()
+
+        now += (target - now) * 0.01  # 緩やかに角度を変化させる
+        # 残差が微小なら吸着させて int 切り捨て停滞を防ぐ
+        if abs(target - now) < 0.05:
+            now = target
+
+        servo_lock.acquire()
+        try:
+            self.now_angle = now
+        finally:
+            servo_lock.release()
+
+        # マッピングしてduty_u16に変換
+        mapped = int(now * (180 - 10) / 180 + 10)
+        duty = int(1638 + (mapped / 180) * (7864 - 1638))
+        self.pwm.duty_u16(duty)
+
+
+
+    
+
+# サーボの初期化 (16〜21番)
+servos = [Servo(p) for p in range(16, 22)]
+
+
+def servo_loop():
+    # 第2コアで一定周期（50Hz）で全軸を同時更新する
+    while True:
+        for servo in servos:
+            servo.update()
+            time.sleep(0.0005)
+
 
 # シリアル入力の監視準備
 poll = select.poll()
 poll.register(sys.stdin, select.POLLIN)
 
-current_msg = "Waiting..."
+
 
 display.fill(0)
 display.rotate(False)
-display.text("LCD Monitor:", 0, 0, 1)
-display.text(current_msg, 0, 16, 1)
+for i ,m in enumerate(["test1"]):
+    display.text(m, 0, i*16, 1)
+
 display.show()
 
-while True:
-    # シリアルからデータが来ていれば非ブロッキングで読み取る
-    events = poll.poll(10)
-    if events:
-        line = sys.stdin.readline()
-        if line:
-            current_msg = line.strip()
-            
-            # 「0,90」のような形式であればサーボを動かす
-            try:
-                if ',' in current_msg:
-                    parts = current_msg.split(',')
-                    if len(parts) == 2:
-                        if parts[0]=="FACE":
-                            image_data = bytes.fromhex(parts[1])
-                            display.buffer[:] = image_data
-                            display.show()
-                        else:
-                            i = int(parts[0])
-                            angle = float(parts[1])
-                            if 0 <= i < len(servos):
-                                set_servo_angle(servos[i], angle)
-            except:
-                pass
 
-    # LCD画面の更新
+
+
+_thread.start_new_thread(servo_loop, ())
+time.sleep(1)  
+# サーボスレッド起動（以後 update() はメインループで呼ばない）
+# for i,servo in enumerate(servos):
+#     # time.sleep(1)
+#     servo.set_servo_angle(90+(-90 if i%2==0 else 45))
+
+last_disp = time.ticks_ms()
+
+while True:
+    # display.fill(0)
+    # display.text(f"{time.ticks_ms()}", 0, 0, 1)
+    # シリアルからデータが来ていれば非ブロッキングで読み取る
+    # （溜まった分はまとめて捌いて古い指令の遅延を防ぐ）
+    while poll.poll(0):
+        line = sys.stdin.readline()
+        if not line:
+            break
+        current_msg = line.strip()
+        # display.text(f"{current_msg}", 0, 16, 1)
+
+        # 「0,90」のような形式であればサーボを動かす
+        try:
+            if ',' in current_msg:
+                parts = current_msg.split(',')
+                if len(parts) == 2:
+                    if parts[0] == "FACE":
+                        image_data = bytes.fromhex(parts[1])
+                        display.buffer[:] = image_data
+                        display.show()
+                    else:
+                        ch = int(parts[0])
+                        angle = float(parts[1])
+                        if 0 <= ch < len(servos):
+                            servos[ch].set_servo_angle(angle)
+        except:
+            pass
+    # display.show()
+
+
+   
+
+    # GILを譲ってサーボスレッドを回す
+    time.sleep(0.005)
+

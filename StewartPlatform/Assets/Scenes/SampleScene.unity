@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 313810325}
   - component: {fileID: 313810326}
   m_Layer: 0
-  m_Name: "servobase-\u30B5\u30FC\u30DC\u306E\u571F\u53F0PolarPattern001"
+  m_Name: servobase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -359,6 +359,7 @@ Transform:
   m_Children:
   - {fileID: 305962463}
   - {fileID: 161902903}
+  - {fileID: 580173585}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -110, y: 0, z: 0}
 --- !u!114 &313810325
@@ -787,6 +788,37 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &580173584
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 580173585}
+  m_Layer: 0
+  m_Name: HeadCalibrationTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &580173585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580173584}
+  serializedVersion: 2
+  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: -0, z: 120}
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 313810324}
+  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
 --- !u!4 &704320982 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3197add1405aa8d4398e774ccef7cd0a, type: 3}
@@ -863,7 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b58dc28edb29a014287726bccaa59e7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FaceMesh
-  eyeBlinkCurve:
+  eyeCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -876,27 +908,51 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.24795078
-      value: 0.0054820348
-      inSlope: 0.046253275
-      outSlope: 0.046253275
+      time: 0.41090712
+      value: 0.024469946
+      inSlope: -0.09383801
+      outSlope: -0.09383801
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.5878702
+      inWeight: 0.09294085
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.58237225
-      value: 0.9993694
-      inSlope: 0.014180242
-      outSlope: 0.014180242
+      time: 0.7478408
+      value: 0.95188624
+      inSlope: 0.9181148
+      outSlope: 0.9181148
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.43365392
+      outWeight: 0.045554824
     - serializedVersion: 3
       time: 1
       value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  mouthCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
       inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
@@ -1197,6 +1253,7 @@ GameObject:
   - component: {fileID: 1720060262}
   - component: {fileID: 1720060261}
   - component: {fileID: 1720060260}
+  - component: {fileID: 1720060264}
   m_Layer: 0
   m_Name: MediapipeBase
   m_TagString: Untagged
@@ -1298,6 +1355,18 @@ Transform:
   - {fileID: 1954966500}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -5, y: 0, z: 0}
+--- !u!114 &1720060264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720060259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a7c0fec4da114843911bb54c963e6df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeadCalibration
 --- !u!1 &1919018478
 GameObject:
   m_ObjectHideFlags: 0
