@@ -96,9 +96,9 @@ display.show()
 _thread.start_new_thread(servo_loop, ())
 time.sleep(1)  
 # サーボスレッド起動（以後 update() はメインループで呼ばない）
-# for i,servo in enumerate(servos):
-#     # time.sleep(1)
-#     servo.set_servo_angle(90+(-90 if i%2==0 else 45))
+for i,servo in enumerate(servos):
+    # time.sleep(1)
+    servo.set_servo_angle(90+(-90 if i%2==0 else 45))
 
 last_disp = time.ticks_ms()
 

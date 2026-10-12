@@ -38,7 +38,7 @@ public class FaceCamera : MonoBehaviour
                 Color32 c = pixels[y * width + x];
                 int gray = (c.r * 299 + c.g * 587 + c.b * 114) / 1000;
 
-                if (gray >= 128)
+                if (!(gray <= 128))
                 {
                     int index = (y / 8) * width + x;
                     data[index] |= (byte)(1 << (y % 8));
