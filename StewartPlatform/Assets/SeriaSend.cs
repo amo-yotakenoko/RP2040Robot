@@ -43,6 +43,7 @@ public class SeriaSend : MonoBehaviour
 
     IEnumerator SerialCoroutine()
     {
+        string lastFaceMessage = "";
         while (true)
         {
             for (int i = 0; i < servos.Count; i++)
@@ -57,18 +58,27 @@ public class SeriaSend : MonoBehaviour
 
                         // シリアルポート経由で送信
                         SendData(message);
+                        yield return null;
                     }
                 }
 
                 // 0.1秒待機（次のサーボへ）
 
             }
-            yield return null;
+            // yield return null;
             byte[] faceFrame = FindFirstObjectByType<FaceCamera>().GetfaceFrame();
             // yield return new WaitForSeconds(0.1f);
-            SendData($"FACE,{BitConverter.ToString(faceFrame).Replace("-", "")}");
+
+            string faceMessage = $"{BitConverter.ToString(faceFrame).Replace("-", "")}";
+            if (faceMessage != lastFaceMessage)
+            {
+                lastFaceMessage = faceMessage;
+                print($"送信: FACE,{faceMessage}");
+                SendData($"FACE,{faceMessage}");
+                yield return new WaitForSeconds(0.1f);
+
+            }
             yield return null;
-            // yield return new WaitForSeconds(0.1f);
         }
     }
 

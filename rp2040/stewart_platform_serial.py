@@ -20,12 +20,14 @@ class Servo:
         self.pwm.freq(50)  # 50Hz for standard servos
         self.now_angle = 90.0
         self.target_angle = 90.0
+        self.enable = False
         self.update()
 
     def set_servo_angle(self, target_angle):
         servo_lock.acquire()
         try:
             self.target_angle = float(target_angle)
+            self.enable = True
         finally:
             servo_lock.release()
 
@@ -37,6 +39,8 @@ class Servo:
             servo_lock.release()
 
     def update(self):
+        if not self.enable:
+            return
         # サーボスレッドからのみ呼ぶ。ロックは短時間だけ掴む。
         servo_lock.acquire()
         try:
@@ -70,11 +74,11 @@ servos = [Servo(p) for p in range(16, 22)]
 
 
 def servo_loop():
-    # 第2コアで一定周期（50Hz）で全軸を同時更新する
+
     while True:
         for servo in servos:
             servo.update()
-            time.sleep(0.0005)
+            time.sleep(0.0001)
 
 
 # シリアル入力の監視準備
@@ -85,20 +89,27 @@ poll.register(sys.stdin, select.POLLIN)
 
 display.fill(0)
 display.rotate(False)
-for i ,m in enumerate(["test1"]):
-    display.text(m, 0, i*16, 1)
+# for i ,m in enumerate(["20261018"]):
+#     display.text(m, 0, i*16, 1)
 
 display.show()
 
 
-
-
 _thread.start_new_thread(servo_loop, ())
-time.sleep(1)  
-# サーボスレッド起動（以後 update() はメインループで呼ばない）
+
 for i,servo in enumerate(servos):
-    # time.sleep(1)
-    servo.set_servo_angle(90+(-90 if i%2==0 else 45))
+    time.sleep(0.1)  
+    servo.set_servo_angle(90)
+    display.fill(0)
+    display.text(f"{'#'*(i+1)}{'_'*(5-i)}", 0, 0, 1)
+    display.show()
+display.text(f"OK!", 0, 16, 1)
+display.show()
+
+
+# サーボスレッド起動（以後 update() はメインループで呼ばない）
+# for j in range(45):
+#         time.sleep(0.1)
 
 last_disp = time.ticks_ms()
 
