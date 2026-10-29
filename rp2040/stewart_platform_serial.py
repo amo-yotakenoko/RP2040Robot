@@ -104,6 +104,7 @@ for i,servo in enumerate(servos):
     display.text(f"{'#'*(i+1)}{'_'*(5-i)}", 0, 0, 1)
     display.show()
 display.text(f"OK!", 0, 16, 1)
+
 display.show()
 
 
@@ -123,7 +124,8 @@ while True:
         if not line:
             break
         current_msg = line.strip()
-        # display.text(f"{current_msg}", 0, 16, 1)
+        display.text(f"{current_msg}", 0, 16, 1)
+        display.show()
 
         # 「0,90」のような形式であればサーボを動かす
         try:

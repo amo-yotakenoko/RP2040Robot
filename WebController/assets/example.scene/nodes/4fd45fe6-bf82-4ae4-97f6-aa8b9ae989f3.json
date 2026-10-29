@@ -1,0 +1,58 @@
+{
+    "tags": null,
+    "position": [
+        -0.018702851152517363,
+        -0.0008251933041053055,
+        0.03692927672877605
+    ],
+    "rotation": [
+        0,
+        0,
+        0
+    ],
+    "rotationQuaternion": [
+        -0.12940952255126015,
+        0.4829629131445343,
+        0.8365163037378078,
+        0.22414386804201333
+    ],
+    "scaling": [
+        1,
+        1,
+        1
+    ],
+    "billboardMode": 0,
+    "scalingDeterminant": 1,
+    "infiniteDistance": false,
+    "ignoreNonUniformScaling": false,
+    "reIntegrateRotationIntoRotationQuaternion": false,
+    "name": "hone000",
+    "id": "4fd45fe6-bf82-4ae4-97f6-aa8b9ae989f3",
+    "state": "",
+    "metadata": {
+        "parentId": 1793191118706
+    },
+    "type": "TransformNode",
+    "uniqueId": 1793191118737,
+    "localMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+    ],
+    "isEnabled": true,
+    "animations": [],
+    "ranges": []
+}

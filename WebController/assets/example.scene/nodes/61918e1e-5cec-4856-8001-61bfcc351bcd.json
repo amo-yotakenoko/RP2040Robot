@@ -1,0 +1,58 @@
+{
+    "tags": null,
+    "position": [
+        -0.018702851152517363,
+        -0.0008251933041053055,
+        0.03692927672877605
+    ],
+    "rotation": [
+        0,
+        0,
+        0
+    ],
+    "rotationQuaternion": [
+        -0.12940952255126054,
+        0.4829629131445341,
+        0.8365163037378077,
+        0.22414386804201394
+    ],
+    "scaling": [
+        1,
+        1,
+        1
+    ],
+    "billboardMode": 0,
+    "scalingDeterminant": 1,
+    "infiniteDistance": false,
+    "ignoreNonUniformScaling": false,
+    "reIntegrateRotationIntoRotationQuaternion": false,
+    "name": "servo000",
+    "id": "61918e1e-5cec-4856-8001-61bfcc351bcd",
+    "state": "",
+    "metadata": {
+        "parentId": 1793191118706
+    },
+    "type": "TransformNode",
+    "uniqueId": 1793191118731,
+    "localMatrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+    ],
+    "isEnabled": true,
+    "animations": [],
+    "ranges": []
+}

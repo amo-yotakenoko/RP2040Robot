@@ -1,96 +1,84 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
 
 public class servo : MonoBehaviour
 {
-    public Transform servoHone;
-    public Transform HornLodPoint;
-    public Transform HeadLodPoint;
+    public List<Transform> hones = new List<Transform>();
+    public List<Transform> uppreholes = new List<Transform>();
 
-    public bool isOpposite;
-    public int id;
-    public float angle;
+    float target_lod_length = 10f;
 
-    float target_lod_length = 100;
-
-    float baseY, baseZ;       // 最初のy, z（固定）
-    float initialAngle;       // 最初の角度（解の選択基準）
+    public float[] angles;
 
     void Start()
     {
-        baseY = servoHone.localEulerAngles.y;
-        baseZ = servoHone.localEulerAngles.z;
-
-        float minAngle = isOpposite ? -180f : 0f;
-        float maxAngle = isOpposite ? 0f : 180f;
-
-        // 最初のX角度を記憶（0〜360 → -180〜180 に直して範囲内にクランプ）
-        float a = servoHone.localEulerAngles.x;
-        if (a > 180f) a -= 360f;
-        initialAngle = Mathf.Clamp(a, minAngle, maxAngle);
-    }
-
-    float Err(float a)
-    {
-        servoHone.localEulerAngles = new Vector3(a, baseY, baseZ);
-        return Vector3.Distance(HornLodPoint.position, HeadLodPoint.position) - target_lod_length;
-    }
-
-    float SolveAngle(float minA, float maxA, out bool solved)
-    {
-        const float step = 2f;
-        float best = float.NaN;
-        float bestDist = float.MaxValue;
-        float minAbsErr = float.MaxValue;
-        float minAbsAngle = initialAngle;
-
-        float prevA = minA;
-        float prevE = Err(prevA);
-        minAbsErr = Mathf.Abs(prevE);
-        minAbsAngle = prevA;
-
-        for (float a = minA + step; a <= maxA + 0.001f; a += step)
+        Transform HeadBase = GameObject.Find($"HeadBase").transform;
+        for (int i = 0; i < 6; i++)
         {
-            float e = Err(a);
+            Transform servoTransform = GameObject.Find($"servo00{i}").transform;
+            Transform honeTransform = GameObject.Find($"hone00{i}").transform;
+            honeTransform.SetParent(servoTransform);
+            hones.Add(honeTransform);
 
-            // 解が無い場合の保険（誤差が最小の角度）
-            if (Mathf.Abs(e) < minAbsErr) { minAbsErr = Mathf.Abs(e); minAbsAngle = a; }
-
-            // 符号が変わった区間に解がある → 二分法で詰める
-            if (prevE * e <= 0f)
-            {
-                float lo = prevA, hi = a, eLo = prevE;
-                for (int k = 0; k < 20; k++)
-                {
-                    float mid = (lo + hi) * 0.5f;
-                    float eMid = Err(mid);
-                    if (eLo * eMid <= 0f) hi = mid;
-                    else { lo = mid; eLo = eMid; }
-                }
-                float root = (lo + hi) * 0.5f;
-
-                // 最初の角度に最も近い解を採用
-                float d = Mathf.Abs(root - initialAngle);
-                if (d < bestDist) { bestDist = d; best = root; }
-            }
-            prevA = a; prevE = e;
+            Transform uppreholeTransform = GameObject.Find($"upperhole00{i}").transform;
+            uppreholeTransform.SetParent(HeadBase);
+            uppreholes.Add(uppreholeTransform);
         }
+    }
 
-        solved = !float.IsNaN(best);
-        return float.IsNaN(best) ? minAbsAngle : best;
+    float CalcDistance(float angle, Transform hone, Transform upperhole)
+    {
+        float prevY = hone.localEulerAngles.y;
+
+        hone.localEulerAngles = new Vector3(0f, angle, 0f);
+
+        Vector3 honeTip = hone.position + hone.forward * 1.35f;
+        float distance = Vector3.Distance(honeTip, upperhole.position);
+
+        hone.localEulerAngles = new Vector3(0f, prevY, 0f);
+
+        return distance;
     }
 
     void Update()
     {
-        float minAngle = isOpposite ? -180f : 0f;
-        float maxAngle = isOpposite ? 0f : 180f;
+        angles = new float[6];
+        int index = 0;
+        foreach (var pair in hones.Zip(uppreholes, (h, u) => (h, u)))
+        {
+            Transform hone = pair.h;
+            Transform upperhole = pair.u;
 
-        bool solved;
-        float currentAngle = SolveAngle(minAngle, maxAngle, out solved);
-        servoHone.localEulerAngles = new Vector3(currentAngle, baseY, baseZ);
+            float offset = (index % 2 == 0) ? 180f : 0f;
 
-        angle = isOpposite ? 180 + currentAngle : currentAngle;
-        this.gameObject.name = $"{angle}";
+            float bestAngle = 0f;
+            float bestDiff = float.MaxValue;
+            bool solved = false;
 
-        Debug.DrawLine(HornLodPoint.position, HeadLodPoint.position, solved ? Color.green : Color.red);
+            // 0〜180度を全探索して最初に十分近い角度を探す
+            for (float angle = 0f; angle <= 180f; angle += 0.5f)
+            {
+                float testAngle = angle + offset;
+                float dist = CalcDistance(testAngle, hone, upperhole);
+                float diff = Mathf.Abs(dist - target_lod_length);
+
+                if (diff < bestDiff)
+                {
+                    bestDiff = diff;
+                    bestAngle = angle;
+                }
+
+
+            }
+
+            hone.localEulerAngles = new Vector3(0f, bestAngle + offset, 0f);
+
+            Vector3 honeTipFinal = hone.position + hone.forward * 1.35f;
+            Debug.DrawLine(honeTipFinal, upperhole.position, solved || bestDiff < 0.1f ? Color.green : Color.red);
+            angles[index] = 180 - bestAngle;
+            index++;
+        }
     }
 }
