@@ -106,6 +106,9 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
+# OpenCode / FreeCAD generated context
+freecad/context/current_document.md
+
 # Babylon.js Editor cache
 **/.bjseditor/.assets-thumbnail-cache.json
 **/.bjseditor/.textures-cache.json

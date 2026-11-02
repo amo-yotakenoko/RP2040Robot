@@ -1,0 +1,89 @@
+"""Export the active FreeCAD document as text for OpenCode.
+
+Run this file from FreeCAD's Macro dialog. The report is written to
+freecad/context/current_document.md relative to this repository.
+"""
+
+import json
+import os
+from pathlib import Path
+
+import FreeCAD as App
+
+
+def _repository_root():
+    try:
+        return Path(__file__).resolve().parents[2]
+    except NameError:
+        return Path.cwd()
+
+
+def _safe_value(value):
+    try:
+        if hasattr(value, "Value"):
+            return {"value": value.Value, "unit": str(value)}
+        if hasattr(value, "toTuple"):
+            return list(value.toTuple())
+        json.dumps(value)
+        return value
+    except Exception:
+        return str(value)
+
+
+def export_document_report():
+    doc = App.ActiveDocument
+    if doc is None:
+        raise RuntimeError("FreeCADでドキュメントを開いてから実行してください。")
+
+    output = _repository_root() / "freecad" / "context" / "current_document.md"
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    lines = [
+        "# FreeCAD current document report",
+        "",
+        "このファイルはFreeCADマクロから自動生成されます。寸法の単位と形状はFreeCADで再確認してください。",
+        "",
+        "## Document",
+        "",
+        "- Label: `{}`".format(doc.Label),
+        "- File: `{}`".format(doc.FileName or "未保存"),
+        "- Object count: `{}`".format(len(doc.Objects)),
+        "",
+        "## Objects",
+        "",
+    ]
+
+    for obj in doc.Objects:
+        lines.extend([
+            "### `{}` ({})".format(obj.Name, obj.TypeId),
+            "",
+            "- Label: `{}`".format(obj.Label),
+        ])
+        if hasattr(obj, "Placement"):
+            lines.append("- Placement: `{}`".format(obj.Placement))
+        if hasattr(obj, "Shape") and not obj.Shape.isNull():
+            box = obj.Shape.BoundBox
+            lines.append(
+                "- BoundingBox mm: `min=({:.3f}, {:.3f}, {:.3f}), max=({:.3f}, {:.3f}, {:.3f}), size=({:.3f}, {:.3f}, {:.3f})`".format(
+                    box.XMin, box.YMin, box.ZMin, box.XMax, box.YMax, box.ZMax,
+                    box.XLength, box.YLength, box.ZLength,
+                )
+            )
+
+        properties = []
+        for prop in getattr(obj, "PropertiesList", []):
+            try:
+                properties.append((prop, _safe_value(getattr(obj, prop))))
+            except Exception:
+                pass
+        if properties:
+            lines.append("- Properties:")
+            for name, value in properties:
+                lines.append("  - `{}`: `{}`".format(name, value))
+        lines.append("")
+
+    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    App.Console.PrintMessage("OpenCode用レポートを書き出しました: {}\n".format(output))
+
+
+export_document_report()
