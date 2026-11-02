@@ -49,7 +49,7 @@ class Servo:
         finally:
             servo_lock.release()
 
-        now += (target - now) * 0.01  # 緩やかに角度を変化させる
+        now += (target - now) * 0.02  # 緩やかに角度を変化させる
         # 残差が微小なら吸着させて int 切り捨て停滞を防ぐ
         if abs(target - now) < 0.05:
             now = target

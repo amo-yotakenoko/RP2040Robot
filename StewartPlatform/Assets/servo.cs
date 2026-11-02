@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+// using System.Numerics;
+
 
 
 public class servo : MonoBehaviour
@@ -26,6 +28,22 @@ public class servo : MonoBehaviour
             uppreholeTransform.SetParent(HeadBase);
             uppreholes.Add(uppreholeTransform);
         }
+
+        Transform vrHead = GameObject.Find("Main Camera").transform;
+        Transform headBase = GameObject.Find("HeadBase").transform;
+
+        Vector3 originalScale = headBase.lossyScale;
+        headBase.SetParent(vrHead, false);
+        Vector3 parentScale = vrHead.lossyScale;
+        headBase.localScale = new Vector3(
+            originalScale.x / parentScale.x,
+            originalScale.y / parentScale.y,
+            originalScale.z / parentScale.z
+        );
+
+
+        // headBase.localPosition = new Vector3(0, 0, 0);
+        // headBase.localEularAngles = new Vector3()
     }
 
     float CalcDistance(float angle, Transform hone, Transform upperhole)
