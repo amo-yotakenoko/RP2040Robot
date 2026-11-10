@@ -47,7 +47,7 @@ class Servo:
             servo_lock.release()
 
         delta = (target - now) * 0.02
-        delta = max(-0.1, min(0.1, delta))
+        delta = max(-0.5, min(0.5, delta))
         now += delta
         
         # 残差が微小なら吸着させて int 切り捨て停滞を防ぐ
@@ -76,7 +76,7 @@ class Servo:
         # mapped_margin=10
 
         # マッピングしてduty_u16に変換
-        mapped = int(now * (180 - 10) / 180 + 10)
+        mapped = int(now * (180 - mapped_margin) / 180 + mapped_margin)
         duty = int(duty_min + (mapped / 180) * (duty_max - duty_min))
 
         if( time.ticks_ms() < self.last_update_time + 1000 ):
