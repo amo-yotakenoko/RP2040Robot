@@ -18,7 +18,6 @@ python -m mpremote run stewart_platform_serial.py
 
 
 
-python -m mpremote ports
 
 
 python -m mpremote fs cp servo.py  :servo.py

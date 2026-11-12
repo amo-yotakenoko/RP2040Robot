@@ -21,7 +21,7 @@ servos[2].set_servo_angle(90)
 # while True:
 #     for i in range(0, len(servos)):
 #         servos[i].set_servo_angle(math.sin(time.ticks_ms()/1000)*90+90)
-    # servos[5].set_servo_angle(math.sin(time.ticks_ms()/1000)*90+90)
+#     servos[5].set_servo_angle(math.sin(time.ticks_ms()/1000)*90+90)
 
 
 # for i in range(0, 6):
