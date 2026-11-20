@@ -57,26 +57,26 @@ public class SeriaSend : MonoBehaviour
                 string message = $"{s},{(int)(servo.angles[s])}";
 
                 // シリアルポート経由で送信
-                SendData(message);
+                // SendData(message);
                 yield return null;
             }
 
 
 
 
-            // yield return null;
-            // byte[] faceFrame = FindFirstObjectByType<FaceCamera>().GetfaceFrame();
-            // // yield return new WaitForSeconds(0.1f);
+            yield return null;
+            byte[] faceFrame = FindFirstObjectByType<FaceCamera>().GetfaceFrame();
+            // yield return new WaitForSeconds(0.1f);
 
-            // string faceMessage = $"{BitConverter.ToString(faceFrame).Replace("-", "")}";
-            // if (faceMessage != lastFaceMessage)
-            // {
-            //     lastFaceMessage = faceMessage;
-            //     print($"送信: FACE,{faceMessage}");
-            //     SendData($"FACE,{faceMessage}");
-            //     yield return new WaitForSeconds(0.1f);
+            string faceMessage = $"{BitConverter.ToString(faceFrame).Replace("-", "")}";
+            if (faceMessage != lastFaceMessage)
+            {
+                lastFaceMessage = faceMessage;
+                print($"送信: FACE,{faceMessage}");
+                SendData($"FACE,{faceMessage}");
+                yield return new WaitForSeconds(11f);
 
-            // }
+            }
             yield return null;
         }
     }
