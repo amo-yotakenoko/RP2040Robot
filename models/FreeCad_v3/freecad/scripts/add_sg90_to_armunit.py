@@ -10,7 +10,7 @@ import os
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 armunit = App.openDocument(os.path.join(ROOT, "Arm", "ArmUnit.FCStd"), False)
 source = App.openDocument(os.path.join(ROOT, "arm_v4.FCStd"), False)
-servo_doc = App.openDocument(os.path.join(ROOT, "sg90.FCStd"), False)
+servo_doc = App.openDocument(os.path.join(ROOT, "Reference", "sg90.FCStd"), False)
 assembly = armunit.getObject("Assembly")
 servo_body = servo_doc.getObject("Body002")
 if assembly is None or servo_body is None:

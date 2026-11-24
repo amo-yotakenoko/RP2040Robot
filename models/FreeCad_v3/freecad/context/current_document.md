@@ -46,3 +46,11 @@ Intermediate directories and rejected probe files were removed. The maintained o
 `freecad/scripts/add_sg90_to_armunit.py` added six external SG90 links to `Arm/ArmUnit.FCStd`, using the original `arm_v4.FCStd` Link placements. ArmUnit now contains 12 component links: six arm parts and six SG90 instances.
 
 Visibility audit: every component primary Body and Tip is visible; ArmUnit root and all 12 component links are visible. Hidden objects are only expected construction/history items (sketches, axes, planes, origins, and Binders). The visual-only ArmSkeleton file and its associated experiment outputs were removed because they were not dependencies of the final model.
+
+Shared/reference models were moved to `Reference/`: `ServoHorn_Master_Single.FCStd`, `ServoHorn_Master_Cross.FCStd`, `sg90.FCStd`, `asv-15-a.FCStd`, `ssd1306.FCStd`, and `camera.FCStd`. Links in `ArmUnit`, Arm parts, `arm_v4`, `main`, `HeadUnit`, and `Head_base` were redirected before the original locations were removed.
+
+`arm_v4.FCStd` and all `arm_v4*.FCBak` files were subsequently removed. The maintained model is now `Arm/` plus `Reference/`.
+
+After the Reference move, the Assembly parent visibility was found false even though its 12 child links were true. `fix_final_visibility.py` was corrected to set the Assembly root visible; a reopen audit now reports Assembly root true, all 12 links true, and all component Body/Tip pairs true.
+
+The omitted original Roll mirror was restored as `Arm/Roll_Mirrored.FCStd`, mirrored across X=0, and added to `ArmUnit` as `Roll_Mirrored_Link` with the Roll mounting placement. Its reopened shape is one solid with bounding box X=-17..15.4, matching the expected mirrored Roll envelope.

@@ -13,8 +13,11 @@ for o in a.Group:
         print("LINK",o.Name,"VISIBLE",o.Visibility,"TARGET",linked.Name if linked else "MISSING","FILE_EXISTS",os.path.exists(path) if linked else False,"FILE",path)
 print("ASSEMBLY_BAD",[(o.Name,list(getattr(o,"State",[]))) for o in asm.Objects if any(x not in ("Up-to-date","Touched") for x in getattr(o,"State",[]))])
 parts=[("ServoHorn_Master_Single","Body003"),("Base","Body006"),("ServoHorn_Master_Cross","Body007"),("UpperArm","Body"),("LowerArm","Body008"),("Roll","Body009")]
+part_dir={"ServoHorn_Master_Single":os.path.join(root,"Reference"),"ServoHorn_Master_Cross":os.path.join(root,"Reference")}
+for name in ("Base","UpperArm","LowerArm","Roll"):
+    part_dir[name]=armdir
 for name,body_name in parts:
-    d=App.openDocument(os.path.join(armdir,name+".FCStd"),False)
+    d=App.openDocument(os.path.join(part_dir[name],name+".FCStd"),False)
     bodies=[o.Name for o in d.Objects if o.TypeId=="PartDesign::Body"]
     broken=[]
     for s in d.Objects:

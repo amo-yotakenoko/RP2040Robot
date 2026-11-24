@@ -4,8 +4,11 @@ import os
 root=os.path.abspath(os.path.join(os.path.dirname(__file__),"..",".."))
 arm=os.path.join(root,"Arm")
 parts=["ServoHorn_Master_Single","Base","ServoHorn_Master_Cross","UpperArm","LowerArm","Roll"]
+part_dir={"ServoHorn_Master_Single":os.path.join(root,"Reference"),"ServoHorn_Master_Cross":os.path.join(root,"Reference")}
+for name in ("Base","UpperArm","LowerArm","Roll"):
+ part_dir[name]=arm
 for name in parts:
- d=App.openDocument(os.path.join(arm,name+".FCStd"),False)
+ d=App.openDocument(os.path.join(part_dir[name],name+".FCStd"),False)
  print("PART",name)
  for o in d.Objects:
   if "SubShapeBinder" in o.TypeId:

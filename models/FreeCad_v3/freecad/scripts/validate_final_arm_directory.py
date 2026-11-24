@@ -2,8 +2,11 @@ import FreeCAD as App
 import os
 root=os.path.abspath(os.path.join(os.path.dirname(__file__),"..",".."))
 parts=[("ServoHorn_Master_Single","Body003"),("Base","Body006"),("ServoHorn_Master_Cross","Body007"),("UpperArm","Body"),("LowerArm","Body008"),("Roll","Body009")]
+part_dir={"ServoHorn_Master_Single":os.path.join(root,"Reference"),"ServoHorn_Master_Cross":os.path.join(root,"Reference")}
+for name in ("Base","UpperArm","LowerArm","Roll"):
+ part_dir[name]=os.path.join(root,"Arm")
 for name,body_name in parts:
- d=App.openDocument(os.path.join(root,"Arm",name+".FCStd"),False)
+ d=App.openDocument(os.path.join(part_dir[name],name+".FCStd"),False)
  bodies=[o for o in d.Objects if o.TypeId=="PartDesign::Body"]
  b=d.getObject(body_name)
  broken=[]

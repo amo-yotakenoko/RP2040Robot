@@ -1,0 +1,19 @@
+"""Show and fit the final ArmUnit in the FreeCAD GUI."""
+import FreeCAD as App
+import FreeCADGui as Gui
+import os
+
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+path = os.path.join(root, "Arm", "ArmUnit.FCStd")
+doc = App.ActiveDocument
+if doc is None or os.path.abspath(doc.FileName) != os.path.abspath(path):
+    doc = App.openDocument(path)
+assembly = doc.getObject("Assembly")
+if assembly:
+    assembly.Visibility = True
+    for obj in assembly.Group:
+        if obj.TypeId == "App::Link":
+            obj.Visibility = True
+doc.recompute()
+Gui.activeDocument().activeView().viewAxonometric()
+Gui.activeDocument().activeView().fitAll()
