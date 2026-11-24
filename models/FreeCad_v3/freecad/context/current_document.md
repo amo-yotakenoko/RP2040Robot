@@ -54,3 +54,5 @@ Shared/reference models were moved to `Reference/`: `ServoHorn_Master_Single.FCS
 After the Reference move, the Assembly parent visibility was found false even though its 12 child links were true. `fix_final_visibility.py` was corrected to set the Assembly root visible; a reopen audit now reports Assembly root true, all 12 links true, and all component Body/Tip pairs true.
 
 The omitted original Roll mirror was restored as `Arm/Roll_Mirrored.FCStd`, mirrored across X=0, and added to `ArmUnit` as `Roll_Mirrored_Link` with the Roll mounting placement. Its reopened shape is one solid with bounding box X=-17..15.4, matching the expected mirrored Roll envelope.
+
+The Roll mirror was then converted from a baked file into a normal `App::Link` to `Arm/Roll.FCStd#Body009` with `ScaleVector=(-1,1,1)` and X=0 mirror placement; no update script is required when Roll changes. A trial six-joint setup was rejected because its guessed part-to-motor topology allowed the solver to change the original poses. The trial joints were removed and the pre-joint pose restored. Assembly joints require a correct rigid/flexible part topology before re-adding them.
