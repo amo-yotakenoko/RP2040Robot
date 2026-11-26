@@ -56,3 +56,35 @@ After the Reference move, the Assembly parent visibility was found false even th
 The omitted original Roll mirror was restored as `Arm/Roll_Mirrored.FCStd`, mirrored across X=0, and added to `ArmUnit` as `Roll_Mirrored_Link` with the Roll mounting placement. Its reopened shape is one solid with bounding box X=-17..15.4, matching the expected mirrored Roll envelope.
 
 The Roll mirror was then converted from a baked file into a normal `App::Link` to `Arm/Roll.FCStd#Body009` with `ScaleVector=(-1,1,1)` and X=0 mirror placement; no update script is required when Roll changes. A trial six-joint setup was rejected because its guessed part-to-motor topology allowed the solver to change the original poses. The trial joints were removed and the pre-joint pose restored. A second trial using direct whole-link references still caused the native solver to reposition the Roll mirror and other links; it was not saved. Assembly joints require explicit connector/JCS geometry and correct rigid/flexible topology before re-adding them.
+
+## Arm file and label rename (2026-11-26)
+
+`freecad/scripts/rename_arm_files_and_verify.py` was executed with FreeCAD
+1.1.3. Component files and display labels are now `BaseYaw`, `UpperArm`,
+`Forearm`, and `WristRoll`; the mirrored Roll link is labeled `WristPitch`.
+ArmUnit external links were updated to the new filenames. After saving, all
+component primary Bodies and Tips, the ArmUnit Assembly root, and all five arm
+links were reopened and verified visible and linked.
+
+The `WristPitch` mirrored link initially retained the old `Roll.FCStd` path.
+`freecad/scripts/repair_armunit_mirrored_link.py` reconnected it to
+`WristRoll.FCStd#Body009` while preserving its mirror scale and placement.
+ArmUnit was reopened again; all five links now resolve and are visible.
+
+Because headless FreeCADCmd did not persist GUI view-provider state, the
+GUI-enabled `freecad/scripts/force_arm_visibility.py` was then run. It saved a
+`GuiDocument.xml` with `Assembly` and all five links visible. The file was
+reopened and the persisted GUI visibility flags were verified as true.
+## Label rename (2026-11-26)
+
+`freecad/scripts/rename_arm_link_labels.py` was executed with FreeCAD 1.1.3.
+Only display labels were changed; internal object names, geometry, placements,
+and dimensions were preserved.
+
+| Existing part/link | New label |
+|---|---|
+| Base / `Base_Link` | `Link1_BaseYaw` |
+| UpperArm / `UpperArm_Link` | `Link2_UpperArm` |
+| LowerArm / `LowerArm_Link` | `Link3_Forearm` |
+| Roll / `Roll_Link` | `Link4_WristRoll` |
+| `Roll_Mirrored_Link` (Roll2) | `Link5_WristPitch` |
