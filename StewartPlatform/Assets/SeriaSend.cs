@@ -49,7 +49,7 @@ public class SeriaSend : MonoBehaviour
 
 
 
-            servo servo = FindFirstObjectByType<servo>();
+            HeadServo servo = FindFirstObjectByType<HeadServo>();
             for (int s = 0; s < servo.angles.Length; s++)
             {
 
