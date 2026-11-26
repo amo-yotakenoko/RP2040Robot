@@ -5,7 +5,7 @@ using System.Linq;
 
 
 
-public class servo : MonoBehaviour
+public class HeadServo : MonoBehaviour
 {
     public List<Transform> hones = new List<Transform>();
     public List<Transform> uppreholes = new List<Transform>();
@@ -19,14 +19,14 @@ public class servo : MonoBehaviour
         Transform HeadBase = GameObject.Find($"HeadBase").transform;
         for (int i = 0; i < 6; i++)
         {
-            Transform servoTransform = GameObject.Find($"servo00{i}").transform;
+            // Transform servoTransform = GameObject.Find($"servo00{i}").transform;
             Transform honeTransform = GameObject.Find($"hone00{i}").transform;
-            honeTransform.SetParent(servoTransform);
+            // honeTransform.SetParent(servoTransform);
             hones.Add(honeTransform);
 
-            Transform uppreholeTransform = GameObject.Find($"upperhole00{i}").transform;
-            uppreholeTransform.SetParent(HeadBase);
-            uppreholes.Add(uppreholeTransform);
+            // Transform uppreholeTransform = GameObject.Find($"upperhole00{i}").transform;
+            // uppreholeTransform.SetParent(HeadBase);
+            // uppreholes.Add(uppreholeTransform);
         }
 
         Transform vrHead = GameObject.Find("Main Camera").transform;
