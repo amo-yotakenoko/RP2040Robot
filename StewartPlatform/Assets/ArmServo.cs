@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 public class ArmServo : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public List<Transform> axis;
-    public List<float> angles;
+    public List<Transform> axis = new List<Transform>();
+    public List<float> angles = new List<float>();
     public Transform ArmTarget;
     Transform Hand;
+
     void Start()
     {
         List<Transform> servos = new List<Transform>();
@@ -20,8 +20,9 @@ public class ArmServo : MonoBehaviour
             axisObj.transform.localPosition = Vector3.zero;
             axisObj.transform.localRotation = Quaternion.identity;
             axis.Add(axisObj.transform);
-            angles.Add(0f);
+            angles.Add(90f); // 初期値を90度に設定
         }
+
         Transform BaseYaw = transform.Find("BaseYaw");
         Transform UpperArm = transform.Find("UpperArm");
         Transform Forearm = transform.Find("Forearm");
@@ -29,12 +30,9 @@ public class ArmServo : MonoBehaviour
         Transform WristPitch = transform.Find("WristPitch");
         Hand = transform.Find("Hand");
 
-
-        // transform.Find($"servo000").transform;
         BaseYaw.SetParent(axis[0]);
 
         axis[1].SetParent(BaseYaw);
-        // axis[1].localRotation = Quaternion.Euler(0f, 0f, 90f);
 
         UpperArm.SetParent(axis[1]);
         servos[1].SetParent(axis[1]);
@@ -51,78 +49,82 @@ public class ArmServo : MonoBehaviour
 
         Hand.SetParent(axis[5]);
 
-
-
-
-
+        fk(angles);
     }
 
     float CalcDistance()
     {
-        // handとArmTargetの距離と角度の差を計算する
+        if (Hand == null || ArmTarget == null) return float.MaxValue;
 
-        // 位置の距離（m）
         float distance = Vector3.Distance(Hand.position, ArmTarget.position);
-
-        // 回転の角度差（0° 〜 180°）
         float angleDiff = Quaternion.Angle(Hand.rotation, ArmTarget.rotation);
 
-        // 単純に足す場合
-        // return distance + angleDiff;
-
-        // 位置と角度のスケールを合わせるための重み付け（例: 角度の重みを 0.01f にする）
-        float angleWeight = 0.01f;
-        return distance + (angleDiff * angleWeight);
+        return distance + angleDiff * 0.001f;
     }
 
-
-    float fk(List<float> angles)
+    float fk(List<float> inputAngles)
     {
-        for (int i = 0; i < angles.Count; i++)
+        for (int i = 0; i < axis.Count; i++)
         {
+            // 90度を基準（オフセット0）として回転姿勢に変換
+            float offsetAngle = inputAngles[i] - 90f;
+
             if (i == 1)
             {
-                axis[i].localEulerAngles = new Vector3(90 + angles[i], 0f, -90f);
+                axis[i].localEulerAngles = new Vector3(90f - offsetAngle, 0f, -90f);
             }
             else
-                axis[i].localEulerAngles = new Vector3(0f, angles[i], 0f);
+            {
+                axis[i].localEulerAngles = new Vector3(0f, offsetAngle, 0f);
+            }
         }
         return CalcDistance();
     }
 
-
-    void updateAngles()
+    bool updateAngles()
     {
+        if (ArmTarget == null || Hand == null) return true;
 
-        float initDistance = CalcDistance();
+        float currentDist = fk(angles);
+        if (currentDist < 0.001f) return true;
 
-
-        for (int i = 0; i < angles.Count; i++)
+        // 手首側から根元に向かって各軸を更新
+        for (int i = angles.Count - 1; i >= 0; i--)
         {
-            List<float> copy = new List<float>(angles);
-            copy[i] += 0.1f;
-            fk(copy);
-            float distance = fk(copy);
-            print(distance);
+            float original = angles[i];
 
-            float grad = (distance - initDistance) * 1000; // 0.1度の変化に対する距離の変化
+            // 微小変化 ±0.05度
+            angles[i] = original + 0.05f;
+            float distPlus = fk(angles);
 
-            angles[i] -= Mathf.Clamp(grad, -1f, 1f); // 角度を減少させる
+            angles[i] = original - 0.05f;
+            float distMinus = fk(angles);
 
-            // angles[i] = grad; // 学習率を0.1に設定
-            print(grad);
+            angles[i] = original;
 
+            // 勾配（傾き）
+            float grad = (distPlus - distMinus) / 0.1f;
+
+            float step = Mathf.Clamp(-grad * 100.0f, -10.0f, 10.0f);
+            angles[i] += step;
+
+            // 0度 〜 180度にクランプ
+            angles[i] = Mathf.Clamp(angles[i], 0f, 180f);
+
+            fk(angles);
         }
+
+        return false;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        fk(angles);
-        updateAngles();
-
-
+        for (int i = 0; i < 100; i++)
+        {
+            if (updateAngles()) break;
+        }
+        // fk(angles);
     }
+
+
 }
-
-

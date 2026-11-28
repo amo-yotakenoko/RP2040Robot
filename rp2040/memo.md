@@ -14,7 +14,7 @@ python -m mpremote fs cp stewart_platform_serial.py  :main.py
 
 
 
-python -m mpremote run stewart_platform_serial.py
+python -m mpremote run main.py
 
 
 

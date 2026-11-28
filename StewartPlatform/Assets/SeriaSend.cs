@@ -49,17 +49,32 @@ public class SeriaSend : MonoBehaviour
 
 
 
-            HeadServo servo = FindFirstObjectByType<HeadServo>();
-            for (int s = 0; s < servo.angles.Length; s++)
+            HeadServo headServo = FindFirstObjectByType<HeadServo>();
+            for (int s = 0; s < headServo.angles.Length; s++)
             {
 
                 // 送信文字列の作成
-                string message = $"{s},{(int)(servo.angles[s])}";
+                string message = $"{s},{(int)(headServo.angles[s])}";
 
                 // シリアルポート経由で送信
-                // SendData(message);
+                SendData(message);
                 yield return null;
             }
+
+
+            ArmServo armServo = FindFirstObjectByType<ArmServo>();
+            for (int s = 0; s < armServo.angles.Count; s++)
+            {
+
+                // 送信文字列の作成
+                string message = $"{s + 6},{180 - (int)(armServo.angles[s])}";
+
+                // シリアルポート経由で送信
+                SendData(message);
+                yield return null;
+            }
+
+
 
 
 
@@ -72,9 +87,9 @@ public class SeriaSend : MonoBehaviour
             if (faceMessage != lastFaceMessage)
             {
                 lastFaceMessage = faceMessage;
-                print($"送信: FACE,{faceMessage}");
-                SendData($"FACE,{faceMessage}");
-                yield return new WaitForSeconds(11f);
+                // print($"送信: FACE,{faceMessage}");
+                // SendData($"FACE,{faceMessage}");
+                // yield return new WaitForSeconds(1f);
 
             }
             yield return null;

@@ -7,6 +7,7 @@ import _thread
 from servo import Servo, servo_loop
 
 
+
 # OLEDディスプレイの初期化
 i2c = I2C(1, sda=Pin(14), scl=Pin(15))
 display = ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3C)
@@ -19,7 +20,7 @@ display = ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3C)
     
 
 # サーボの初期化 (16〜21番)
-servos = [Servo(p) for p in range(16, 22)]
+servos = [Servo(p) for p in list(range(16, 22)) + list(range(7, 13))]
 
 
 
@@ -44,7 +45,7 @@ for i,servo in enumerate(servos):
     time.sleep(0.1)  
     servo.set_servo_angle(90)
     display.fill(0)
-    display.text(f"{'#'*(i+1)}{'_'*(5-i)}", 0, 0, 1)
+    display.text(f"{'#'*(i+1)}{'_'*(len(servos)-1-i)}", 0, 0, 1)
     display.show()
 display.text(f"OK!", 0, 16, 1)
 
@@ -67,8 +68,8 @@ while True:
         if not line:
             break
         current_msg = line.strip()
-        display.text(f"{current_msg}", 0, 16, 1)
-        display.show()
+        # display.text(f"{current_msg}", 0, 16, 1)
+        # display.show()
 
         # 「0,90」のような形式であればサーボを動かす
         try:
